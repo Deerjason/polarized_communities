@@ -5,7 +5,7 @@ import gc
 
 class SignedGraph:
 
-    def __init__(self, dataset_path):
+    def __init__(self, dataset_path, number_of_nodes = None, adj_list = None, S = None):
         # nodes
         self.number_of_nodes = 0
         self.nodes_iterator = xrange(0)
@@ -17,11 +17,15 @@ class SignedGraph:
         self.a = None
         self.l = None
 
-        # load the dataset
-        self.load_dataset(dataset_path)
+        if dataset_path is not None:
+            # load the dataset
+            self.load_dataset(dataset_path)
 
-        # set the dataset path
-        self.dataset_path = dataset_path
+            # set the dataset path
+            self.dataset_path = dataset_path
+        else:
+            # load the dataset
+            self.manual_load(number_of_nodes, adj_list, S)
 
         # call the garbage collector
         gc.collect()
@@ -49,6 +53,24 @@ class SignedGraph:
 
             # add the undirected edge
             self.add_edge(from_node, to_node, sign)
+
+    def manual_load(self, number_of_nodes, adj_list, S):
+
+        # get the number of nodes from the first line
+        self.number_of_nodes = number_of_nodes
+        self.nodes_iterator = xrange(self.number_of_nodes)
+
+        # create the empty adjacency list
+        self.adjacency_list = [[array('i'), array('i')] for _ in self.nodes_iterator]
+
+        # fill the adjacency matrix (0: positive neighbors, 1: negative neighbors)
+        for node, neighbors in adj_list.items():
+            from_node = node
+            for neighbor in neighbors:
+                to_node = neighbor
+                sign = S[(node, neighbor)]
+                # add the undirected edge
+                self.add_edge(from_node, to_node, sign)
 
     # add the edge to the adjacency list if it is not a self loop
     def add_edge(self, from_node, to_node, sign):
