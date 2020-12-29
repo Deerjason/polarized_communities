@@ -1,5 +1,8 @@
 # [Discovering Polarized Communities in Signed Networks](http://edoardogalimberti.altervista.org/documents/papers/***.pdf)
 
+## Changes to Fork
+eigensign algorithm changed to output multiple subgraphs (applies the same algorithm to the resulting subgraphs until only one subgraph is returned)
+
 ## Folders
 * datasets: datasets listed in Table 1
 * polarized_communities: code
