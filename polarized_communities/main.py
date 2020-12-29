@@ -31,11 +31,57 @@ if __name__ == '__main__':
 
     # read the input graph
     signed_graph = SignedGraph(args.d)
-    print_input(args.d, args.a)
 
+    print_input(args.d, args.a)
     # execute the algorithm
     if args.a == 'eigensign':
         solution, x = eigensign(signed_graph)
+        communities = []
+        adj = signed_graph.get_adjacency_matrix()
+        S_1 = []
+        S_2 = []
+        for u in solution:
+            if x[u] == -1:
+                S_2.append(u)
+            elif x[u] == 1:
+                S_1.append(u)
+        queue = []
+        if len(S_1) == 0:
+            if len(S_2) > 0:
+                communities.append(S_2)
+        elif len(S_2) == 0:
+            communities.append(S_1)
+        else:
+            queue = [S_1, S_2]
+        while len(queue) > 0:
+            subG = queue.pop()
+            S = {}
+            adj_1 = {}
+            for u in subG:
+                adj_1[u] = []
+                for v in subG:
+                    if adj[u,v] != 0:
+                        adj_1[u].append(v)
+                        S[(u, v)] = adj[u, v]
+            signed_graph_ = SignedGraph(None, signed_graph.number_of_nodes, adj_1, S)
+            solution, x = eigensign(signed_graph_)
+            S_1 = []
+            S_2 = []
+            for u in solution:
+                if x[u] == -1:
+                    S_2.append(u)
+                elif x[u] == 1:
+                    S_1.append(u)
+            if len(S_1) == 0:
+                communities.append(S_2)
+            elif len(S_2) == 0:
+                communities.append(S_1)
+            else:
+                queue.append(S_1)
+                queue.append(S_2)
+        print('----- Polarized Communities -----')
+        for community in communities:
+            print(community)
 
     elif args.a == 'random_eigensign':
         solution, x, maximum_eigenvector, execution_time_seconds, beta = random_eigensign(signed_graph, args.b)
