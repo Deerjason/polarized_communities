@@ -55,6 +55,12 @@ if __name__ == '__main__':
             queue = [S_1, S_2]
         while len(queue) > 0:
             subG = queue.pop()
+
+            # Stops once subgraph has less than 10 vertices
+            if len(subG) < 10:
+                communities.append(subG)
+                continue
+            
             S = {}
             adj_1 = {}
             for u in subG:
