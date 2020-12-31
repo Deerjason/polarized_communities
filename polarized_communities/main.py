@@ -82,6 +82,13 @@ if __name__ == '__main__':
         print('----- Polarized Communities -----')
         for community in communities:
             print(community)
+        
+        f = open(args.d + '_NUCLEI.txt', 'w')
+        for community in communities:
+            for node in community:
+                f.write(str(node) + ' ')
+            f.write('-1\n')
+        f.close()
 
     elif args.a == 'random_eigensign':
         solution, x, maximum_eigenvector, execution_time_seconds, beta = random_eigensign(signed_graph, args.b)
