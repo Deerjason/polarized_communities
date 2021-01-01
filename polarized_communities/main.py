@@ -51,15 +51,14 @@ if __name__ == '__main__':
                 communities.append(S_2)
         elif len(S_2) == 0:
             communities.append(S_1)
+        elif len(S_1) + len(S_2) < 10:
+            communities.append(None)
+            communities.append(S_1)
+            communities.append(S_2)
         else:
             queue = [S_1, S_2]
         while len(queue) > 0:
             subG = queue.pop()
-
-            # Stops once subgraph has less than 10 vertices
-            if len(subG) < 10:
-                communities.append(subG)
-                continue
             
             S = {}
             adj_1 = {}
@@ -82,6 +81,11 @@ if __name__ == '__main__':
                 communities.append(S_2)
             elif len(S_2) == 0:
                 communities.append(S_1)
+            # Stops once union of subgraphs has less than 10 vertices
+            elif len(S_1) + len(S_2) < 10:
+                communities.append(None)
+                communities.append(S_1)
+                communities.append(S_2)
             else:
                 queue.append(S_1)
                 queue.append(S_2)
@@ -90,10 +94,26 @@ if __name__ == '__main__':
             print(community)
         
         f = open(args.d + '_NUCLEI.txt', 'w')
+        multiple = False
+        left = True
         for community in communities:
-            for node in community:
-                f.write(str(node) + ' ')
-            f.write('-1\n')
+            if community is None:
+                multiple = True
+            elif multiple:
+                if left:
+                    for node in community:
+                        f.write(str(node) + ' ')
+                    f.write('-1 ')
+                else:
+                    for node in community:
+                        f.write(str(node) + ' ')
+                    f.write('-1\n')
+                    multiple = False
+                    left = True
+            else:
+                for node in community:
+                    f.write(str(node) + ' ')
+                f.write('-1 -1\n')
         f.close()
 
     elif args.a == 'random_eigensign':
