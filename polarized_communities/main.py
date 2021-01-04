@@ -112,7 +112,7 @@ if __name__ == '__main__':
         for community in communities:
             print(community)
         
-        f = open(args.d + '_NUCLEI', 'w')
+        f = open(args.d + '_' + args.a + '_NUCLEI', 'w')
         multiple = False
         left = True
         communityID = 1
