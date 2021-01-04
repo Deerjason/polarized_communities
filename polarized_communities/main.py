@@ -36,6 +36,20 @@ if __name__ == '__main__':
     # execute the algorithm
     if args.a == 'eigensign':
         solution, x = eigensign(signed_graph)
+
+    elif args.a == 'random_eigensign':
+        solution, x, maximum_eigenvector, execution_time_seconds, beta = random_eigensign(signed_graph, args.b)
+
+    elif args.a == 'bansal':
+        solution, x = bansal(signed_graph)
+
+    elif args.a == 'random_local':
+        solution, x = local_search(signed_graph, args.mi, args.ct)
+
+    elif args.a == 'greedy_signed_degree':
+        solution, x = greedy_degree_removal(signed_graph)
+
+    if args.a == 'eigensign' or args.a == 'bansal' or args.a == 'greedy_signed_degree':
         communities = []
         adj = signed_graph.get_adjacency_matrix()
         S_1 = []
@@ -69,7 +83,12 @@ if __name__ == '__main__':
                         adj_1[u].append(v)
                         S[(u, v)] = adj[u, v]
             signed_graph_ = SignedGraph(None, signed_graph.number_of_nodes, adj_1, S)
-            solution, x = eigensign(signed_graph_)
+            if args.a == 'eigensign':
+                solution, x = eigensign(signed_graph_)
+            elif args.a == 'bansal':
+                solution, x = bansal(signed_graph_)
+            elif args.a == 'greedy_signed_degree':
+                solution, x = greedy_degree_removal(signed_graph_)
             S_1 = []
             S_2 = []
             for u in solution:
@@ -93,12 +112,15 @@ if __name__ == '__main__':
         for community in communities:
             print(community)
         
-        f = open(args.d + '_NUCLEI.txt', 'w')
+        f = open(args.d + '_NUCLEI', 'w')
         multiple = False
         left = True
+        communityID = 1
         for community in communities:
             if community is None:
                 multiple = True
+                f.write(str(communityID) + '\t')
+                communityID += 1
             elif multiple:
                 if left:
                     for node in community:
@@ -111,19 +133,9 @@ if __name__ == '__main__':
                     multiple = False
                     left = True
             else:
+                f.write(str(communityID) + '\t')
+                communityID += 1
                 for node in community:
                     f.write(str(node) + ' ')
                 f.write('-1 -1\n')
         f.close()
-
-    elif args.a == 'random_eigensign':
-        solution, x, maximum_eigenvector, execution_time_seconds, beta = random_eigensign(signed_graph, args.b)
-
-    elif args.a == 'bansal':
-        solution, x = bansal(signed_graph)
-
-    elif args.a == 'random_local':
-        solution, x = local_search(signed_graph, args.mi, args.ct)
-
-    elif args.a == 'greedy_signed_degree':
-        solution, x = greedy_degree_removal(signed_graph)
