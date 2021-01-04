@@ -1,7 +1,9 @@
 # [Discovering Polarized Communities in Signed Networks](http://edoardogalimberti.altervista.org/documents/papers/***.pdf)
 
 ## Changes to Fork
-eigensign algorithm changed to output multiple subgraphs (applies the same algorithm to the resulting subgraphs until only one subgraph is returned)
+* eigensign, bansal, and greedy_signed_degree algorithms changed to output multiple subgraphs (applies the same algorithm to the resulting subgraphs until only one subgraph is returned)
+* generates a [d]<span>&#95;</span>NUCLEI file in which each line represents a subgraph as: [ID]\t[left subset] -1 [right subset] -1
+  * Example: 1&emsp;3 4 5 -1 2 6 -1
 
 ## Folders
 * datasets: datasets listed in Table 1
