@@ -126,6 +126,7 @@ if __name__ == '__main__':
                     for node in community:
                         f.write(str(node) + ' ')
                     f.write('-1 ')
+                    left = False
                 else:
                     for node in community:
                         f.write(str(node) + ' ')
