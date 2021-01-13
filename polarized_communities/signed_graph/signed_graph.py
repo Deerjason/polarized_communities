@@ -5,7 +5,7 @@ import gc
 
 class SignedGraph:
 
-    def __init__(self, dataset_path, number_of_nodes = None, adj_list = None, S = None):
+    def __init__(self, dataset_path, number_of_nodes = None, adj = None, subG = None):
         # nodes
         self.number_of_nodes = 0
         self.nodes_iterator = xrange(0)
@@ -25,7 +25,7 @@ class SignedGraph:
             self.dataset_path = dataset_path
         else:
             # load the dataset
-            self.manual_load(number_of_nodes, adj_list, S)
+            self.manual_load(number_of_nodes, adj, subG)
 
         # call the garbage collector
         gc.collect()
@@ -54,7 +54,7 @@ class SignedGraph:
             # add the undirected edge
             self.add_edge(from_node, to_node, sign)
 
-    def manual_load(self, number_of_nodes, adj_list, S):
+    def manual_load(self, number_of_nodes, adj, subG):
 
         # get the number of nodes from the first line
         self.number_of_nodes = number_of_nodes
@@ -63,14 +63,12 @@ class SignedGraph:
         # create the empty adjacency list
         self.adjacency_list = [[array('i'), array('i')] for _ in self.nodes_iterator]
 
-        # fill the adjacency matrix (0: positive neighbors, 1: negative neighbors)
-        for node, neighbors in adj_list.items():
-            from_node = node
-            for neighbor in neighbors:
-                to_node = neighbor
-                sign = S[(node, neighbor)]
-                # add the undirected edge
-                self.add_edge(from_node, to_node, sign)
+        cx = coo_matrix(adj)
+
+        for i,j,v in zip(cx.row, cx.col, cx.data):
+            if i not in subG or j not in subG:
+                
+                self.add_edge(i, j, v)
 
     # add the edge to the adjacency list if it is not a self loop
     def add_edge(self, from_node, to_node, sign):
