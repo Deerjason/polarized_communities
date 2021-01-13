@@ -54,35 +54,29 @@ if __name__ == '__main__':
         adj = signed_graph.get_adjacency_matrix()
         S_1 = []
         S_2 = []
+        S = []
         for u in solution:
             if x[u] == -1:
                 S_2.append(u)
+                S.append(u)
             elif x[u] == 1:
                 S_1.append(u)
-        queue = []
+                S.append(u)
         if len(S_1) == 0:
-            if len(S_2) > 0:
-                communities.append(S_2)
+            communities.append(S_2)
         elif len(S_2) == 0:
             communities.append(S_1)
-        elif len(S_1) + len(S_2) < 10:
+        else:
             communities.append(None)
             communities.append(S_1)
             communities.append(S_2)
-        else:
-            queue = [S_1, S_2]
+        queue = [S]
         while len(queue) > 0:
             subG = queue.pop()
-            
-            S = {}
-            adj_1 = {}
-            for u in subG:
-                adj_1[u] = []
-                for v in subG:
-                    if adj[u,v] != 0:
-                        adj_1[u].append(v)
-                        S[(u, v)] = adj[u, v]
-            signed_graph_ = SignedGraph(None, signed_graph.number_of_nodes, adj_1, S)
+
+            signed_graph_ = SignedGraph(None, signed_graph.number_of_nodes, adj, set(subG))
+            adj = signed_graph_.get_adjacency_matrix()
+
             if args.a == 'eigensign':
                 solution, x = eigensign(signed_graph_)
             elif args.a == 'bansal':
@@ -91,36 +85,34 @@ if __name__ == '__main__':
                 solution, x = greedy_degree_removal(signed_graph_)
             S_1 = []
             S_2 = []
+            S = []
             for u in solution:
                 if x[u] == -1:
                     S_2.append(u)
+                    S.append(u)
                 elif x[u] == 1:
                     S_1.append(u)
-            if len(S_1) == 0:
-                communities.append(S_2)
-            elif len(S_2) == 0:
-                communities.append(S_1)
-            # Stops once union of subgraphs has less than 10 vertices
-            elif len(S_1) + len(S_2) < 10:
-                communities.append(None)
-                communities.append(S_1)
-                communities.append(S_2)
-            else:
-                queue.append(S_1)
-                queue.append(S_2)
-        print('----- Polarized Communities -----')
-        for community in communities:
-            print(community)
-        
-        f = open(args.d + '_' + args.a + '_NUCLEI', 'w')
+                    S.append(u)
+            num_nodes = len(S)
+            if signed_graph.number_of_nodes == num_nodes:
+                break
+            if num_nodes >= 10:
+                if len(S_1) == 0:
+                    communities.append(S_2)
+                elif len(S_2) == 0:
+                    communities.append(S_1)
+                else:
+                    communities.append(None)
+                    communities.append(S_1)
+                    communities.append(S_2)
+                queue.append(S)
+
+        f = open(args.d + '_' + args.a + '_subgraphs', 'w')
         multiple = False
         left = True
-        communityID = 1
         for community in communities:
             if community is None:
                 multiple = True
-                f.write(str(communityID) + '\t')
-                communityID += 1
             elif multiple:
                 if left:
                     for node in community:
@@ -134,8 +126,6 @@ if __name__ == '__main__':
                     multiple = False
                     left = True
             else:
-                f.write(str(communityID) + '\t')
-                communityID += 1
                 for node in community:
                     f.write(str(node) + ' ')
                 f.write('-1 -1\n')
