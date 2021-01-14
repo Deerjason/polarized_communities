@@ -50,7 +50,7 @@ if __name__ == '__main__':
         solution, x = greedy_degree_removal(signed_graph)
 
     if args.a == 'eigensign' or args.a == 'bansal' or args.a == 'greedy_signed_degree':
-        communities = []
+        f = open(args.d + '_' + args.a + '_subgraphs', 'w')
         adj = signed_graph.get_adjacency_matrix()
         S_1 = []
         S_2 = []
@@ -62,14 +62,19 @@ if __name__ == '__main__':
             elif x[u] == 1:
                 S_1.append(u)
                 S.append(u)
-        if len(S_1) == 0:
-            communities.append(S_2)
-        elif len(S_2) == 0:
-            communities.append(S_1)
+        if len(S_2) > len(S_1):
+            S_1, S_2 = S_2, S_1
+        if len(S_2) == 0:
+            for node in S_1:
+                f.write(str(node) + ' ')
+            f.write('-1 -1\n')
         else:
-            communities.append(None)
-            communities.append(S_1)
-            communities.append(S_2)
+            for node in S_1:
+                f.write(str(node) + ' ')
+            f.write('-1 ')
+            for node in S_2:
+                f.write(str(node) + ' ')
+            f.write('-1\n')
         queue = [S]
         while len(queue) > 0:
             subG = queue.pop()
@@ -97,36 +102,18 @@ if __name__ == '__main__':
             if signed_graph.number_of_nodes == num_nodes:
                 break
             if num_nodes >= 10:
-                if len(S_1) == 0:
-                    communities.append(S_2)
-                elif len(S_2) == 0:
-                    communities.append(S_1)
+                if len(S_2) > len(S_1):
+                    S_1, S_2 = S_2, S_1
+                if len(S_2) == 0:
+                    for node in S_1:
+                        f.write(str(node) + ' ')
+                    f.write('-1 -1\n')
                 else:
-                    communities.append(None)
-                    communities.append(S_1)
-                    communities.append(S_2)
-                queue.append(S)
-
-        f = open(args.d + '_' + args.a + '_subgraphs', 'w')
-        multiple = False
-        left = True
-        for community in communities:
-            if community is None:
-                multiple = True
-            elif multiple:
-                if left:
-                    for node in community:
+                    for node in S_1:
                         f.write(str(node) + ' ')
                     f.write('-1 ')
-                    left = False
-                else:
-                    for node in community:
+                    for node in S_2:
                         f.write(str(node) + ' ')
                     f.write('-1\n')
-                    multiple = False
-                    left = True
-            else:
-                for node in community:
-                    f.write(str(node) + ' ')
-                f.write('-1 -1\n')
+                queue.append(S)
         f.close()
