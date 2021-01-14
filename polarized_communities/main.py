@@ -75,10 +75,9 @@ if __name__ == '__main__':
             for node in S_2:
                 f.write(str(node) + ' ')
             f.write('-1\n')
-        queue = [S]
-        while len(queue) > 0:
-            subG = queue.pop()
-
+        subG = S
+        num_nodes = 0
+        while signed_graph.number_of_nodes != num_nodes:
             signed_graph_ = SignedGraph(None, signed_graph.number_of_nodes, adj, set(subG))
             adj = signed_graph_.get_adjacency_matrix()
 
@@ -99,21 +98,20 @@ if __name__ == '__main__':
                     S_1.append(u)
                     S.append(u)
             num_nodes = len(S)
-            if signed_graph.number_of_nodes == num_nodes:
+            if num_nodes < 10:
                 break
-            if num_nodes >= 10:
-                if len(S_2) > len(S_1):
-                    S_1, S_2 = S_2, S_1
-                if len(S_2) == 0:
-                    for node in S_1:
-                        f.write(str(node) + ' ')
-                    f.write('-1 -1\n')
-                else:
-                    for node in S_1:
-                        f.write(str(node) + ' ')
-                    f.write('-1 ')
-                    for node in S_2:
-                        f.write(str(node) + ' ')
-                    f.write('-1\n')
-                queue.append(S)
+            if len(S_2) > len(S_1):
+                S_1, S_2 = S_2, S_1
+            if len(S_2) == 0:
+                for node in S_1:
+                    f.write(str(node) + ' ')
+                f.write('-1 -1\n')
+            else:
+                for node in S_1:
+                    f.write(str(node) + ' ')
+                f.write('-1 ')
+                for node in S_2:
+                    f.write(str(node) + ' ')
+                f.write('-1\n')
+            subG = S
         f.close()
